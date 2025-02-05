@@ -21,19 +21,12 @@ def generate_global_dependency_diagram(modules: List[Module]) -> str:
     :return: A string containing Mermaid diagram syntax.
     """
     try:
-        module_names: Set[str] = {module.name for module in modules if module.name}
-        edges = set()
-
+        diagram_lines = ["```mermaid", "graph LR"]
+        module_names = {module.name for module in modules}
         for module in modules:
-            if not module.name:
-                continue
             for imp in module.imports:
                 if imp.module and imp.module in module_names:
-                    edge = f"{module.name} --> {imp.module}"
-                    edges.add(edge)
-                    
-        diagram_lines = ["```mermaid", "graph TD"]
-        diagram_lines.extend(sorted(edges))
+                    diagram_lines.append(f'    {module.name} --> {imp.module}')
         diagram_lines.append("```")
         return "\n".join(diagram_lines)
     except Exception as e:

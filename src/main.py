@@ -24,12 +24,9 @@ except ImportError:
 
 def process_file(file_path, root_dir, output_dir, linters, halt_on_errors):
     """
-    Process a single Python file:
-      - Read and autoformat its code in memory.
-      - Write the formatted code to a temporary file.
-      - Run the linter on the temporary file.
-      - If linting passes, generate markdown using the formatted code.
-    Returns the parsed module object.
+    1) Autoformat code in memory
+    2) Lint code
+    3) If lint passes, generate markdown
     """
     print(f"\nProcessing file: {file_path}")
     relative_path = Path(file_path).relative_to(Path(root_dir))
@@ -67,18 +64,24 @@ def process_file(file_path, root_dir, output_dir, linters, halt_on_errors):
     import os
     os.remove(tmp_path)
 
-    if stop_processing:
-        print("Halting processing due to linting errors.")
-        sys.exit(1)
-
-    # Generate markdown using the formatted code.
+    # We'll add the lint warnings to the module object after generation
     module_obj = generate_markdown(
         file_path=file_path,
-        root_dir=root_dir,  # pass the root for reference
+        root_dir=root_dir,
         output_dir=output_dir,
         source_code=formatted_code,
         relative_path=relative_path
     )
+
+    # If the module object is returned, store any lint messages in .lint_warnings
+    if module_obj:
+        all_warnings = []
+        for linter, (rcode, output) in lint_results.items():
+            if output.strip():
+                for line in output.strip().splitlines():
+                    all_warnings.append(line)
+        module_obj.lint_warnings = all_warnings
+
     return module_obj
 
 def process_all_files(root_dir, output_dir, linters, halt_on_errors):
@@ -103,47 +106,19 @@ def process_all_files(root_dir, output_dir, linters, halt_on_errors):
 
 def main():
     description = (
-        "Generate interlinked markdown documentation from a Python codebase\n"
-        "for Obsidian."
+        "Generate interlinked markdown documentation from a Python codebase for Obsidian."
     )
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "--watch",
-        action="store_true",
-        help=(
-            "Enable watch mode: monitor for file changes and update "
-            "documentation incrementally."
-        )
-    )
-    parser.add_argument(
-        "--root",
-        type=str,
-        help=(
-            "Root directory of the Python codebase to scan "
-            "(overrides config)."
-        )
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        help=(
-            "Output directory for generated markdown files "
-            "(overrides config)."
-        )
-    )
+    parser.add_argument("--watch", action="store_true", help="Enable watch mode: monitor for file changes and update documentation incrementally.")
+    parser.add_argument("--root", type=str, help="Root directory of the Python codebase (overrides config).")
+    parser.add_argument("--output", type=str, help="Output directory for generated markdown files (overrides config).")
     args = parser.parse_args()
 
     config = load_config()
-    root_dir = args.root if args.root else config.get("root_directory",
-                                                       "./src")
-    output_dir = (
-        args.output
-        if args.output
-        else config.get("output_directory", "./output_markdown")
-    )
+    root_dir = args.root if args.root else config.get("root_directory", "./src")
+    output_dir = args.output if args.output else config.get("output_directory", "./output_markdown")
     linters = config.get("linters", {})
     halt_on_errors = config.get("halt_on_errors", True)
-
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     if args.watch:
@@ -151,7 +126,6 @@ def main():
         start_watching(root_dir, output_dir, linters, halt_on_errors)
     else:
         process_all_files(root_dir, output_dir, linters, halt_on_errors)
-
 
 if __name__ == "__main__":
     main()

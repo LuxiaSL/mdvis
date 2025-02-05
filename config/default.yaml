@@ -1,4 +1,4 @@
-root_directory: "path/to/file"
+root_directory: "c:/projects/hephia"
 output_directory: "./output_markdown"
 linters:
   flake8: "flake8"
