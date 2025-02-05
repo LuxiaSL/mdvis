@@ -1,2 +1,4 @@
 PyYAML>=6.0
 flake8>=3.9
+autopep8
+pathspec

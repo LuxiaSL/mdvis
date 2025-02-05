@@ -1,63 +1,34 @@
-# Python Codebase to Markdown Visualizer
+# Python Codebase to Markdown Visualizer (MDVis)
 
-This project transforms a Python codebase into interlinked markdown files optimized for Obsidian.
+Transform your Python codebase into linked markdown documentation that works great with Obsidian.
 
-## Features
+## What it Does
 
-- **Scanning:** Recursively scans a specified directory for Python files.
-- **Linting:** Integrates with external linting tools (e.g., flake8) to check code quality.
-- **Markdown Generation:** Converts each Python file into a markdown file with syntax highlighting.
-- **Modularity:** Designed with a modular architecture for future extension (e.g., AST parsing and visualization).
+- scans the configured directory for all python files
+- cleans them in memory with autopep8, lints after
+- generates obsidian-friendly .md files containing:
+  - Syntax highlighted code
+  - Function and class documentation
+  - Cross-file links
+  - Navigation structure
 
-## Setup
+## Quick Start
 
-1. **Install Dependencies:**
-
+1. Install it:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Configuration:**
+2. Configure (optional):
+   - Edit `config/default.yaml` to point to your directory
 
-   The default configuration is located in `config/default.yaml`. You can modify it as needed.
-
-3. **Run the Application:**
-
+3. Run:
    ```bash
-   python src/main.py
+   python -m src.main
    ```
 
-## Testing
+## Development
 
-Tests are located in the `tests/` directory. Run them using your favorite test runner (e.g., `pytest`).
-
-## Project Structure
-
-```
-README.md
-config/
-  default.yaml
-pyproject.toml
-requirements.txt
-setup.py
-src/
-  core/
-    __init__.py
-    generator.py
-    linter.py
-    parser.py
-    scanner.py
-  main.py
-  models/
-    __init__.py
-    code_elements.py
-  utils/
-    __init__.py
-    config.py
-tests/
-  __init__.py
-  test_generator.py
-  test_linter.py
-  test_parser.py
-  test_scanner.py
-```
+- **Testing:** Run `pytest` in project root
+- **Contributing:** go ahead and feed it into claude
+- **License:** MIT

@@ -27,12 +27,16 @@ def run_linter(linter_command: str, file_path: str) -> Tuple[int, str]:
     except Exception as e:
         return (-1, f"Linter error: {str(e)}")
 
-def lint_file(file_path: str, linters: Dict[str, str]) -> Dict[str, Tuple[int, str]]:
+def lint_file(
+        file_path: str,
+        linters: Dict[str, str]
+    ) -> Dict[str, Tuple[int, str]]:
     """
     Run all configured linters on a file.
     
     :param file_path: The Python file to lint.
-    :param linters: A dictionary with linter names as keys and command names as values.
+    :param linters: A dictionary with linter names
+    as keys and command names as values.
     :return: Dictionary with linter results.
     """
     results = {}

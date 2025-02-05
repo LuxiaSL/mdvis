@@ -1,41 +1,53 @@
 """
 Scanner Module
 
-Recursively scans a specified directory for Python (.py) files.
+Recursively scans a specified directory for Python (.py) files,
+optionally respecting a .gitignore pattern list.
 """
 
 import os
 from pathlib import Path
-from typing import Generator, List
+from typing import List, Optional
 
-def scan_for_python_files(directory: str) -> List[str]:
+import pathspec
+
+def load_gitignore_patterns(gitignore_path: str) -> pathspec.PathSpec:
+    """
+    Load .gitignore-style patterns from the specified file into a PathSpec object.
+    If the file doesn't exist, return an empty PathSpec.
+    """
+    gitignore_file = Path(gitignore_path)
+    if not gitignore_file.exists():
+        return pathspec.PathSpec.from_lines('gitignore', [])
+    
+    with open(gitignore_file, 'r', encoding='utf-8') as f:
+        patterns = f.readlines()
+    return pathspec.PathSpec.from_lines('gitignore', patterns)
+
+def scan_for_python_files(
+    directory: str, 
+    gitignore_path: Optional[str] = None
+) -> List[str]:
     """
     Recursively scan the given directory for .py files.
-    Raises FileNotFoundError if the directory does not exist.
-    
-    :param directory: The root directory to scan.
-    :return: A list of absolute file paths.
+    If gitignore_path is provided, skip files matching the .gitignore patterns.
     """
     path_obj = Path(directory)
     if not path_obj.exists():
         raise FileNotFoundError(f"Directory not found: {directory}")
-    
-    python_files = []
-    # Use rglob to recursively search for *.py files
-    for file_path in path_obj.rglob("*.py"):
-        python_files.append(str(file_path.resolve()))
-    return python_files
 
-def scan_for_python_files_generator(directory: str) -> Generator[str, None, None]:
-    """
-    Generator version for scanning Python files.
-    
-    :param directory: The root directory to scan.
-    :yield: Absolute file path of each Python file found.
-    """
-    path_obj = Path(directory)
-    if not path_obj.exists():
-        raise FileNotFoundError(f"Directory not found: {directory}")
-    
+    # Load the .gitignore patterns if a path is provided.
+    ignore_spec = pathspec.PathSpec.from_lines('gitignore', [])
+    if gitignore_path:
+        ignore_spec = load_gitignore_patterns(gitignore_path)
+
+    python_files = []
     for file_path in path_obj.rglob("*.py"):
-        yield str(file_path.resolve())
+        relative_path = file_path.relative_to(path_obj)
+        # Check if this file matches any gitignore patterns.
+        if ignore_spec.match_file(str(relative_path)):
+            # Skip if it matches the .gitignore patterns.
+            continue
+        python_files.append(str(file_path.resolve()))
+
+    return python_files

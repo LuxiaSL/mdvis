@@ -1,58 +1,157 @@
 """
 Main driver for the codebase markdown visualizer.
-Integrates scanning, linting, parsing, markdown generation, and dashboard creation.
+Integrates scanning, linting, parsing, markdown generation, and
+dashboard creation.
 """
 
 import sys
+import argparse
 from pathlib import Path
 
-from utils.config import load_config
-from core.scanner import scan_for_python_files
-from core.linter import lint_file
-from core.generator import generate_markdown, generate_dashboard
+from src.utils.config import load_config
+from src.core.scanner import scan_for_python_files
+from src.core.linter import lint_file
+from src.core.generator import (
+    generate_markdown, generate_dashboard, clean_code
+)
+# Stub for file watcher import.
+try:
+    from src.core.watcher import start_watching
+except ImportError:
+    def start_watching(root_dir, output_dir, linters, halt_on_errors):
+        print("Watch mode is not yet implemented.")
+        sys.exit(0)
+
+def process_file(file_path, root_dir, output_dir, linters, halt_on_errors):
+    """
+    Process a single Python file:
+      - Read and autoformat its code in memory.
+      - Write the formatted code to a temporary file.
+      - Run the linter on the temporary file.
+      - If linting passes, generate markdown using the formatted code.
+    Returns the parsed module object.
+    """
+    print(f"\nProcessing file: {file_path}")
+    relative_path = Path(file_path).relative_to(Path(root_dir))
+    # Read the original file.
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            original_code = f.read()
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+        sys.exit(1)
+
+    # Autoformat the code.
+    print("Autoformatting code...")
+    formatted_code = clean_code(original_code)
+
+    # Write formatted code to a temporary file.
+    import tempfile
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".py", delete=False, encoding="utf-8"
+    ) as tmp:
+        tmp.write(formatted_code)
+        tmp_path = tmp.name
+
+    # Lint the temporary file.
+    lint_results = lint_file(tmp_path, linters)
+    stop_processing = False
+    for linter, (code, output) in lint_results.items():
+        print(f"  [{linter}] Return code: {code}")
+        if output.strip():
+            print(f"  [{linter}] Output:\n{output}")
+        if halt_on_errors and code != 0:
+            stop_processing = True
+
+    # Clean up the temporary file.
+    import os
+    os.remove(tmp_path)
+
+    if stop_processing:
+        print("Halting processing due to linting errors.")
+        sys.exit(1)
+
+    # Generate markdown using the formatted code.
+    module_obj = generate_markdown(
+        file_path=file_path,
+        root_dir=root_dir,  # pass the root for reference
+        output_dir=output_dir,
+        source_code=formatted_code,
+        relative_path=relative_path
+    )
+    return module_obj
+
+def process_all_files(root_dir, output_dir, linters, halt_on_errors):
+    """
+    Process all Python files under root_dir and generate the dashboard.
+    Now attempts to load .gitignore from root_dir to skip ignored files.
+    """
+    gitignore_path = Path(root_dir) / ".gitignore"
+    print(f"Scanning for Python files in: {root_dir}")
+    python_files = scan_for_python_files(str(root_dir), str(gitignore_path))
+    print(f"Found {len(python_files)} Python files.")
+
+    module_index = []
+    for file_path in python_files:
+        mod_obj = process_file(file_path, root_dir, output_dir, linters, halt_on_errors)
+        if mod_obj:
+            module_index.append(mod_obj)
+
+    if module_index:
+        generate_dashboard(module_index, output_dir)
+
 
 def main():
-    # Load configuration from YAML
+    description = (
+        "Generate interlinked markdown documentation from a Python codebase\n"
+        "for Obsidian."
+    )
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "--watch",
+        action="store_true",
+        help=(
+            "Enable watch mode: monitor for file changes and update "
+            "documentation incrementally."
+        )
+    )
+    parser.add_argument(
+        "--root",
+        type=str,
+        help=(
+            "Root directory of the Python codebase to scan "
+            "(overrides config)."
+        )
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        help=(
+            "Output directory for generated markdown files "
+            "(overrides config)."
+        )
+    )
+    args = parser.parse_args()
+
     config = load_config()
-    root_dir = config.get("root_directory", "./src")
-    output_dir = config.get("output_directory", "./output_markdown")
+    root_dir = args.root if args.root else config.get("root_directory",
+                                                       "./src")
+    output_dir = (
+        args.output
+        if args.output
+        else config.get("output_directory", "./output_markdown")
+    )
     linters = config.get("linters", {})
     halt_on_errors = config.get("halt_on_errors", True)
 
-    # Ensure output directory exists
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    print(f"Scanning for Python files in: {root_dir}")
-    python_files = scan_for_python_files(root_dir)
-    print(f"Found {len(python_files)} Python files.")
+    if args.watch:
+        print("Watch mode enabled. Monitoring for changes...")
+        start_watching(root_dir, output_dir, linters, halt_on_errors)
+    else:
+        process_all_files(root_dir, output_dir, linters, halt_on_errors)
 
-    module_index = []  # Global index for dashboard generation
-
-    for file_path in python_files:
-        print(f"\nProcessing file: {file_path}")
-        
-        # Lint the file
-        lint_results = lint_file(file_path, linters)
-        stop_processing = False
-        for linter, (code, output) in lint_results.items():
-            print(f"  [{linter}] Return code: {code}")
-            if output.strip():
-                print(f"  [{linter}] Output:\n{output}")
-            if halt_on_errors and code != 0:
-                stop_processing = True
-
-        if stop_processing:
-            print("Halting processing due to linting errors.")
-            sys.exit(1)
-
-        # Generate markdown file from Python file (with parsed structure)
-        module_obj = generate_markdown(file_path, output_dir)
-        if module_obj:
-            module_index.append(module_obj)
-    
-    # Generate a dashboard file with links to all modules.
-    if module_index:
-        generate_dashboard(module_index, output_dir)
 
 if __name__ == "__main__":
     main()

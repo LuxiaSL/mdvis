@@ -116,16 +116,19 @@ def unicode_func():
     os.remove(py_file)
 
 def test_generate_dashboard_with_empty_modules():
+    import tempfile
+    from pathlib import Path
+    from src.core.generator import generate_dashboard
     with tempfile.TemporaryDirectory() as tmp_output:
         generate_dashboard([], tmp_output)
         dashboard_file = Path(tmp_output) / "Dashboard.md"
         assert dashboard_file.exists()
         with open(dashboard_file, 'r', encoding='utf-8') as f:
             content = f.read()
+            # Should contain only the header when no modules exist.
             assert "# Codebase Dashboard" in content
-            # Allow for possible blank lines, so count only non-empty lines
+            # Expect only one non-empty line (the header) in this case.
             non_empty_lines = [line for line in content.splitlines() if line.strip()]
-            # Expect only one line (the header) if there are no modules.
             assert len(non_empty_lines) == 1
 
 def test_generate_dashboard_file_permissions():
@@ -170,6 +173,10 @@ def test_generate_markdown_with_syntax_error():
     os.remove(py_file)
 
 def test_generate_dashboard():
+    import tempfile
+    from pathlib import Path
+    from src.models.code_elements import Module
+    from src.core.generator import generate_dashboard
     dummy_modules = [
         Module(name="moduleOne", file_path="dummy1.py", source="dummy source"),
         Module(name="moduleTwo", file_path="dummy2.py", source="dummy source"),
@@ -188,15 +195,58 @@ def test_generate_dashboard():
             # Check header
             assert content.startswith("# Codebase Dashboard"), "Missing dashboard header"
 
-            # Check module links for modules with non-empty names
+            # Check that module links are present for modules with non-empty names.
             for module in dummy_modules:
-                if module.name:  # Skip empty names
+                if module.name:
                     expected_link = f"[[{module.name}"
                     expected_anchor = f"#{{#module-{module.name.lower().replace(' ', '-')}}}"
                     assert expected_link in content, f"Missing module link for {module.name}"
                     assert expected_anchor in content, f"Missing anchor for {module.name}"
 
-            # Verify that every non-empty line after the header starts with "- [["
-            lines = content.splitlines()[1:]  # skip header
-            non_empty_lines = [line for line in lines if line.strip()]
-            assert all(line.startswith("- [[") for line in non_empty_lines), "Invalid link format"
+            # Now, verify that the section after the links is the dependency diagram heading.
+            lines = content.splitlines()
+            # Find the index of the "## Module Dependency Diagram" heading.
+            diagram_heading_indices = [i for i, line in enumerate(lines) if line.strip() == "## Module Dependency Diagram"]
+            assert diagram_heading_indices, "Dependency diagram heading missing"
+
+
+def test_frontmatter_in_markdown():
+    import tempfile
+    from pathlib import Path
+    from src.core.generator import generate_markdown
+    python_content = '''
+import os
+from typing import List
+from pathlib import Path
+
+class TestClass:
+    def method1(self): pass
+    def method2(self): pass
+
+class AnotherClass:
+    pass
+
+def function1(): pass
+def function2(): pass
+'''
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as tmp:
+        tmp.write(python_content)
+        py_file = tmp.name
+
+    with tempfile.TemporaryDirectory() as tmp_output:
+        module_obj = generate_markdown(py_file, tmp_output)
+        md_file = Path(tmp_output) / (Path(py_file).stem + ".md")
+        assert md_file.exists(), "Markdown file was not created"
+        with open(md_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            # Now, because frontmatter is output at the very beginning, the file should start with ---
+            assert content.startswith("---"), "YAML frontmatter not present at the top"
+            # Check for expected frontmatter keys.
+            assert "title:" in content, "Frontmatter missing title"
+            assert "file_path:" in content, "Frontmatter missing file_path"
+            assert "classes:" in content, "Frontmatter missing classes count"
+            assert "functions:" in content, "Frontmatter missing functions count"
+            assert "imports:" in content, "Frontmatter missing imports count"
+            assert "tags:" in content, "Frontmatter missing tags"
+    os.remove(py_file)
+

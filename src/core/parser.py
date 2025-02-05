@@ -15,7 +15,9 @@ and building visual dependency graphs.
 import ast
 from pathlib import Path
 from typing import List
-from ..models.code_elements import Module, Class, Function, ImportStatement, Call
+from ..models.code_elements import (
+    Module, Class, Function, ImportStatement, Call
+)
 
 def extract_call_chain(node: ast.AST) -> List[str]:
     if isinstance(node, ast.Name):
