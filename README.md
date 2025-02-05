@@ -19,7 +19,7 @@ Transform your Python codebase into linked markdown documentation that works gre
    pip install -r requirements.txt
    ```
 
-2. Configure (optional):
+2. Configure:
    - Edit `config/default.yaml` to point to your directory
 
 3. Run:
