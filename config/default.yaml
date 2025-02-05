@@ -1,0 +1,7 @@
+# Default configuration for the codebase visualizer
+
+root_directory: "./src"
+output_directory: "./output_markdown"
+linters:
+  flake8: "flake8"
+halt_on_errors: true
