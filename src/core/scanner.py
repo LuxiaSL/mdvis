@@ -5,7 +5,6 @@ Recursively scans a specified directory for Python (.py) files,
 optionally respecting a .gitignore pattern list.
 """
 
-import os
 from pathlib import Path
 from typing import List, Optional
 

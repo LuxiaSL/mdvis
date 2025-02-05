@@ -14,6 +14,7 @@ from src.core.linter import lint_file
 from src.core.generator import (
     generate_markdown, generate_dashboard, clean_code
 )
+from src.core.event_documentation import generate_events_documentation
 # Stub for file watcher import.
 try:
     from src.core.watcher import start_watching
@@ -102,6 +103,9 @@ def process_all_files(root_dir, output_dir, linters, halt_on_errors):
 
     if module_index:
         generate_dashboard(module_index, output_dir)
+
+        event_doc_path = Path(output_dir) / "Event_Documentation.md"
+        generate_events_documentation(module_index, str(event_doc_path))
 
 
 def main():
