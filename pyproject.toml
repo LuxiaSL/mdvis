@@ -1,15 +1,147 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "codebase-markdown-visualizer"
-version = "0.1.0"
-description = "Transform a Python codebase into interlinked markdown files for Obsidian."
+name = "mdvis"
+version = "0.3.0"
+description = "Transform Python codebases into interlinked Obsidian-compatible markdown documentation"
+readme = "README.md"
 authors = [
-  { name="Your Name", email="you@example.com" }
+    {name = "Luxia", email = "mail.luxia@gmail.com"}
 ]
+keywords = ["documentation", "markdown", "obsidian", "python", "codebase", "visualization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers", 
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup :: Markdown"
+]
+requires-python = ">=3.8"
 dependencies = [
-  "PyYAML",
-  # Add additional dependencies if needed
+    # Core CLI and UI
+    "click>=7.0.0",
+    "rich>=12.0.0",
+    
+    # Configuration and validation
+    "pydantic>=2.0.0",
+    "pyyaml>=5.4.0",
+    
+    # Templates and output
+    "jinja2>=3.0.0",
+    
+    # File processing
+    "pathspec>=0.9.0",
+    "aiofiles>=0.8.0",
+    
+    # AST processing (for Python < 3.9 compatibility)
+    "astor>=0.8.0",
+    
+    # Type hints for older Python versions
+    "typing-extensions>=4.0.0; python_version<'3.10'"
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=6.0.0",
+    "pytest-cov>=3.0.0",
+    "pytest-asyncio>=0.20.0",
+    
+    # Code formatting and linting
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "ruff>=0.1.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+    
+    # Code formatting (optional, for auto-format feature)
+    "autopep8>=1.6.0",
+    
+    # Pre-commit hooks
+    "pre-commit>=2.20.0"
+]
+
+# Optional extra for enhanced linting
+lint = [
+    "flake8>=5.0.0",
+    "autopep8>=1.6.0",
+    "mypy>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/luxia/mdvis"
+Repository = "https://github.com/luxia/mdvis"
+Documentation = "https://github.com/luxia/mdvis#readme"
+"Bug Tracker" = "https://github.com/luxia/mdvis/issues"
+
+[project.scripts]
+mdvis = "mdvis.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mdvis"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/README.md",
+    "/pyproject.toml",
+]
+
+# Development tools configuration
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["mdvis"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = [
+    "--cov=mdvis",
+    "--cov-report=term-missing",
+    "--cov-report=html",
 ]

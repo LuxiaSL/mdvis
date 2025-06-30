@@ -1,7 +1,28 @@
 [flake8]
-ignore = E501, W291, W504, E226
+ignore = 
+    E203,
+    W503,
+    E501,
+    F401,
+    F811,
+    E226,
+    W291,
+    W504
+
+# Directories to exclude from linting
 exclude = 
     .git,
     __pycache__,
+    .venv,
+    venv,
+    env,
     build,
-    dist
+    dist,
+    .eggs,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache,
+    .coverage,
+    htmlcov,
+    docs/_build,
+    examples/sample_project
