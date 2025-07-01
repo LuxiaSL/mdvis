@@ -1,3 +1,304 @@
+---
+title: cli
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/cli.py
+package: mdvis
+stats:
+  classes: 1
+  functions: 20
+  lines_of_code: 817
+  complexity: 98
+tags:
+  - python
+  - module
+  - oop
+  - async
+---
+
+# cli
+
+> [!info] Documentation
+> Enhanced command line interface for mdvis.
+> 
+> Provides a comprehensive, user-friendly CLI with excellent help text,
+> error handling, and development workflow support.
+
+## Table of Contents
+
+### Classes
+- [[#class-mdviserror|MDVisError]]
+
+### Functions
+- [[#function-validate-source-path|validate_source_path]]
+- [[#function-validate-output-path|validate_output_path]]
+- [[#function-validate-config-path|validate_config_path]]
+- [[#function-cli|cli]]
+- [[#function-scan|scan]]
+- [[#function-init|init]]
+- [[#function-validate|validate]]
+- [[#function-clean|clean]]
+- [[#function-stats|stats]]
+- [[#function-main|main]]
+
+
+## Imports
+
+- **import** `asyncio`
+- **import** `sys`
+- **import** `time`
+- **from** `datetime` **import** `datetime`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `List`, `Optional`, `Tuple`
+- **import** `click`
+- **from** `rich.console` **import** `Console`
+- **from** `rich.progress` **import** `Progress`, `SpinnerColumn`, `TextColumn`, `BarColumn`, `TimeElapsedColumn`
+- **from** `rich.table` **import** `Table`
+- **from** `rich.panel` **import** `Panel`
+- **from** `rich.text` **import** `Text`
+- **from** `rich.syntax` **import** `Syntax`
+- **from** `config.manager` **import** [[manager#class-configmanager|ConfigManager]], [[manager#class-configurationerror|ConfigurationError]]
+- **from** `config.schema` **import** [[schema#class-mdvisconfig|MDVisConfig]]
+
+## Classes
+
+### MDVisError {#class-mdviserror}
+
+> [!info] Documentation
+> Base exception for MDVis CLI errors.
+
+**Inherits from:** `Exception`
+
+
+## Functions
+
+### validate_source_path {#function-validate-source-path}
+
+**Signature:** `def validate_source_path(ctx, param, value)`
+
+> [!info] Documentation
+> Validate that source path exists and contains Python files.
+
+
+### validate_output_path {#function-validate-output-path}
+
+**Signature:** `def validate_output_path(ctx, param, value)`
+
+> [!info] Documentation
+> Validate and prepare output path.
+
+
+### validate_config_path {#function-validate-config-path}
+
+**Signature:** `def validate_config_path(ctx, param, value)`
+
+> [!info] Documentation
+> Validate configuration file path.
+
+
+### cli {#function-cli}
+
+**Signature:** `def cli(ctx, verbose)`
+
+> [!info] Documentation
+> MDVis - Python Codebase Documentation Generator
+> 
+> Transform your Python codebases into rich, navigable Obsidian-compatible 
+> documentation with smart cross-references, type information, and dependency 
+> visualizations.
+> 
+> 
+> Features:
+> • Smart cross-references between modules, classes, and functions
+> • Type-aware linking that connects type hints to definitions
+> • Dependency visualization with Mermaid diagrams
+> • Multiple verbosity levels (minimal, standard, detailed)
+> • Async pattern detection and event system mapping
+> • Highly configurable with multi-layer configuration
+> 
+> 
+> Quick Start:
+> • mdvis scan ./src                    # Basic documentation generation
+> • mdvis init --project-name "MyApp"   # Create configuration file
+> • mdvis scan ./src --verbosity detailed --output ./docs
+> 
+> 
+> Get Help:
+> • mdvis COMMAND --help               # Help for specific commands
+> • mdvis scan --help                  # Detailed scan options
+
+
+### scan {#function-scan}
+
+**Signature:** `def scan(ctx, source_path, output, config, verbosity, include_private, events, diagrams, auto_format, exclude, watch, dry_run, stats)`
+
+> [!info] Documentation
+> Scan source code and generate documentation.
+> 
+> SOURCE_PATH is the root directory containing Python source code to document.
+> 
+> 
+> Examples:
+> 
+>   Basic usage:
+>   mdvis scan ./src
+>   
+>   Detailed documentation with custom output:
+>   mdvis scan ./src --output ./docs --verbosity detailed
+>   
+>   Use custom config and exclude test files:
+>   mdvis scan ./src --config ./my-config.yaml --exclude "**/test_*.py"
+>   
+>   Include private methods with diagrams:
+>   mdvis scan ./src --include-private --diagrams
+>   
+>   Watch mode for development:
+>   mdvis scan ./src --output ./docs --watch
+>   
+>   Dry run to preview what will be processed:
+>   mdvis scan ./src --dry-run --stats
+> 
+> 
+> Verbosity Levels:
+> • minimal   - Clean headers, basic cross-references
+> • standard  - Balanced detail with type information (default)
+> • detailed  - Complete metrics, full cross-reference anchors
+> 
+> 
+> Output Structure:
+> • Mirror mode (default) - Mirrors source directory structure
+> • Generated files use .md extension optimized for Obsidian
+> • Includes README.md with project overview and navigation
+
+
+### init {#function-init}
+
+**Signature:** `def init(project_name, output, user, template)`
+
+> [!info] Documentation
+> Create a default configuration file.
+> 
+> This generates a commented configuration file with sensible defaults
+> that you can customize for your project.
+> 
+> 
+> Examples:
+> 
+>   Create project config:
+>   mdvis init --project-name "MyProject"
+>   
+>   Create comprehensive config with all options:
+>   mdvis init --project-name "MyApp" --template comprehensive
+>   
+>   Create user-level config:
+>   mdvis init --user
+>   
+>   Custom output location:
+>   mdvis init --output ./config/mdvis.yaml
+> 
+> 
+> Config Locations:
+> • Project: ./docs/mdvis.yaml (committed with project)
+> • User: ~/.config/mdvis/config.yaml (personal defaults)
+
+
+### validate {#function-validate}
+
+**Signature:** `def validate(config_path, source, detailed)`
+
+> [!info] Documentation
+> Validate configuration file and project setup.
+> 
+> Checks configuration syntax, validates paths, and reports any issues.
+> Helps ensure your setup is correct before running documentation generation.
+> 
+> CONFIG_PATH is the path to the configuration file to validate.
+> If not provided, searches for config in standard locations.
+> 
+> 
+> Examples:
+> 
+>   Validate current project configuration:
+>   mdvis validate
+>   
+>   Validate specific config file:
+>   mdvis validate ./my-config.yaml
+>   
+>   Validate with detailed information:
+>   mdvis validate --detailed
+>   
+>   Validate against specific source directory:
+>   mdvis validate --source ./src
+
+
+### clean {#function-clean}
+
+**Signature:** `def clean(output_path, force, backup)`
+
+> [!info] Documentation
+> Remove generated documentation files.
+> 
+> OUTPUT_PATH is the documentation directory to clean.
+> 
+> This removes all .md files and other generated content from the
+> specified directory, helping you start fresh.
+> 
+> 
+> Examples:
+> 
+>   Clean documentation directory:
+>   mdvis clean ./docs
+>   
+>   Force clean without confirmation:
+>   mdvis clean ./docs --force
+>   
+>   Clean with backup:
+>   mdvis clean ./docs --backup
+> 
+> 
+> Safety:
+> • Only removes .md files and known generated content
+> • Preserves your custom documentation files
+> • Use --backup for extra safety
+
+
+### stats {#function-stats}
+
+**Signature:** `def stats(source_path)`
+
+> [!info] Documentation
+> Show statistics about a Python codebase.
+> 
+> Analyzes the codebase and provides detailed statistics about
+> files, classes, functions, and complexity without generating
+> documentation.
+> 
+> SOURCE_PATH is the root directory containing Python source code.
+> 
+> 
+> Examples:
+> 
+>   Show codebase statistics:
+>   mdvis stats ./src
+>   
+>   Analyze current directory:
+>   mdvis stats .
+
+
+### main {#function-main}
+
+**Signature:** `def main()`
+
+> [!info] Documentation
+> Enhanced main entry point.
+
+
+## TODOs
+
+- [ ] Line 481: TODO: Implement backup functionality
+
+## Source Code
+
+```python
 """
 Enhanced command line interface for mdvis.
 
@@ -815,3 +1116,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+```

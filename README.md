@@ -34,6 +34,11 @@ pip install -e .
 ### Basic Usage
 
 ```bash
+source .venv/bin/activate
+
+# Verify installation
+mdvis --help
+
 # Generate documentation for your src directory
 mdvis scan ./src
 
@@ -81,7 +86,6 @@ mdvis scan ./src --dry-run
 - `--events/--no-events` - Enable/disable event detection
 - `--diagrams/--no-diagrams` - Enable/disable visualizations
 - `--exclude` - Exclude patterns (can be used multiple times)
-- `--watch, -w` - Watch for changes and regenerate
 - `--dry-run` - Show what would be processed
 
 ## 📖 Documentation Structure
@@ -106,7 +110,7 @@ docs/
 Each module gets comprehensive documentation:
 
 - **Smart Cross-References** - `[[database#class-user]]` links directly to class definitions
-- **Type Linking** - `param: YourCustomClass` automatically links to the class
+- **Type Linking** - `param: CognitiveMemoryNode` automatically links to the class
 - **Function Calls** - Shows where functions are called with links to definitions
 - **Inheritance Trees** - Base classes link to their definitions
 - **Import Resolution** - `from utils import helpers` links to `[[helpers]]`

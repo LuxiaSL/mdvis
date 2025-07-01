@@ -1,3 +1,220 @@
+---
+title: elements
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/models/elements.py
+package: mdvis.models
+stats:
+  classes: 14
+  functions: 0
+  lines_of_code: 274
+  complexity: 14
+tags:
+  - python
+  - module
+  - oop
+---
+
+# elements
+
+> [!info] Documentation
+> Enhanced code element models for mdvis.
+> 
+> These models represent the structure of parsed Python code with rich metadata
+> for cross-referencing, type analysis, and documentation generation.
+
+## Table of Contents
+
+### Classes
+- [[#class-visibilitylevel|VisibilityLevel]]
+- [[#class-asyncpatterntype|AsyncPatternType]]
+- [[#class-location|Location]]
+- [[#class-typeref|TypeRef]]
+- [[#class-parameter|Parameter]]
+- [[#class-eventusage|EventUsage]]
+- [[#class-asyncpattern|AsyncPattern]]
+- [[#class-callref|CallRef]]
+- [[#class-importstatement|ImportStatement]]
+- [[#class-decorator|Decorator]]
+- [[#class-function|Function]]
+- [[#class-attribute|Attribute]]
+- [[#class-class|Class]]
+- [[#class-module|Module]]
+
+
+## Imports
+
+- **from** `__future__` **import** `annotations`
+- **from** `dataclasses` **import** `dataclass`, `field`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `Any`, `Dict`, `List`, `Optional`, `Set`, `Union`
+- **from** `enum` **import** `Enum`
+
+## Classes
+
+### VisibilityLevel {#class-visibilitylevel}
+
+> [!info] Documentation
+> Code element visibility levels.
+
+**Inherits from:** `Enum`
+
+#### Attributes
+
+- **PUBLIC** = `'public'` *(class variable)*
+- **PROTECTED** = `'_protected'` *(class variable)*
+- **PRIVATE** = `'__private__'` *(class variable)*
+
+
+### AsyncPatternType {#class-asyncpatterntype}
+
+> [!info] Documentation
+> Types of async patterns detected in code.
+
+**Inherits from:** `Enum`
+
+#### Attributes
+
+- **ASYNC_FUNCTION** = `'async_function'` *(class variable)*
+- **ASYNC_METHOD** = `'async_method'` *(class variable)*
+- **ASYNC_CONTEXT_MANAGER** = `'async_context_manager'` *(class variable)*
+- **ASYNC_GENERATOR** = `'async_generator'` *(class variable)*
+- **ASYNC_COMPREHENSION** = `'async_comprehension'` *(class variable)*
+- **CREATE_TASK** = `'create_task'` *(class variable)*
+- **GATHER** = `'gather'` *(class variable)*
+- **FACTORY_METHOD** = `'factory_method'` *(class variable)*
+
+
+### Location {#class-location}
+
+> [!info] Documentation
+> Source code location information.
+
+
+### TypeRef {#class-typeref}
+
+> [!info] Documentation
+> Reference to a type with linking information.
+
+
+### Parameter {#class-parameter}
+
+> [!info] Documentation
+> Function/method parameter with rich type information.
+
+
+### EventUsage {#class-eventusage}
+
+> [!info] Documentation
+> Event usage pattern detected in code.
+
+
+### AsyncPattern {#class-asyncpattern}
+
+> [!info] Documentation
+> Async pattern detected in code.
+
+
+### CallRef {#class-callref}
+
+> [!info] Documentation
+> Reference to a function/method call with linking info.
+
+
+### ImportStatement {#class-importstatement}
+
+> [!info] Documentation
+> Import statement with resolution information.
+
+
+### Decorator {#class-decorator}
+
+> [!info] Documentation
+> Decorator information.
+
+
+### Function {#class-function}
+
+> [!info] Documentation
+> Enhanced function/method representation.
+
+#### Methods
+
+##### get_anchor {#method-get-anchor}
+
+**Signature:** `def get_anchor(self, prefix: str = '') -> str`
+
+> [!info] Documentation
+> Generate markdown anchor for this function.
+
+**Returns:** `str`
+
+
+
+### Attribute {#class-attribute}
+
+> [!info] Documentation
+> Class or instance attribute.
+
+
+### Class {#class-class}
+
+> [!info] Documentation
+> Enhanced class representation.
+
+#### Methods
+
+##### get_anchor {#method-get-anchor}
+
+**Signature:** `def get_anchor(self, prefix: str = '') -> str`
+
+> [!info] Documentation
+> Generate markdown anchor for this class.
+
+**Returns:** `str`
+
+
+
+### Module {#class-module}
+
+> [!info] Documentation
+> Enhanced module representation.
+
+#### Methods
+
+##### get_anchor {#method-get-anchor}
+
+**Signature:** `def get_anchor(self, prefix: str = '') -> str`
+
+> [!info] Documentation
+> Generate markdown anchor for this module.
+
+**Returns:** `str`
+
+
+##### get_all_functions {#method-get-all-functions}
+
+**Signature:** `def get_all_functions(self) -> List[Function]`
+
+> [!info] Documentation
+> Get all functions including class methods.
+
+**Returns:** `List[Function]`
+
+
+##### get_all_types {#method-get-all-types}
+
+**Signature:** `def get_all_types(self) -> List[str]`
+
+> [!info] Documentation
+> Get all type names defined in this module.
+
+**Returns:** `List[str]`
+
+
+
+## Source Code
+
+```python
 """
 Enhanced code element models for mdvis.
 
@@ -272,3 +489,4 @@ class Module:
             for nested_cls in cls.nested_classes:
                 types.append(f"{cls.name}.{nested_cls.name}")
         return types
+```

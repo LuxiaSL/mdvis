@@ -1,3 +1,129 @@
+---
+title: manager
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/config/manager.py
+package: mdvis.config
+stats:
+  classes: 2
+  functions: 0
+  lines_of_code: 338
+  complexity: 45
+tags:
+  - python
+  - module
+  - oop
+---
+
+# manager
+
+> [!info] Documentation
+> Configuration manager with multi-layer resolution.
+> 
+> Handles the priority chain: CLI Args → Project Config → User Config → Built-in Defaults
+
+## Table of Contents
+
+### Classes
+- [[#class-configurationerror|ConfigurationError]]
+- [[#class-configmanager|ConfigManager]]
+
+
+## Imports
+
+- **import** `os`
+- **import** `yaml`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `Any`, `Dict`, `List`, `Optional`, `Union`
+- **from** `pydantic` **import** `ValidationError`
+- **from** [[schema]] **import** [[schema#class-mdvisconfig|MDVisConfig]], [[schema#function-get-default-config|get_default_config]]
+
+## Classes
+
+### ConfigurationError {#class-configurationerror}
+
+> [!info] Documentation
+> Configuration-related error.
+
+**Inherits from:** `Exception`
+
+
+### ConfigManager {#class-configmanager}
+
+> [!info] Documentation
+> Manages configuration loading and resolution with multiple layers.
+> 
+> Priority order (highest to lowest):
+> 1. CLI arguments (runtime behavior)
+> 2. Project config file (./docs/mdvis.yaml or specified path)
+> 3. User config file (~/.config/mdvis/config.yaml)  
+> 4. Built-in defaults
+
+#### Methods
+
+##### load_config {#method-load-config}
+
+**Signature:** `def load_config(self, project_root: Optional[Path] = None, config_file: Optional[Path] = None, cli_args: Optional[Dict[str, Any]] = None) -> MDVisConfig`
+
+> [!info] Documentation
+> Load configuration with multi-layer resolution.
+> 
+> Args:
+>     project_root: Root directory to search for project config
+>     config_file: Explicit config file path (overrides auto-discovery)
+>     cli_args: CLI arguments to use as highest priority overrides
+>     
+> Returns:
+>     Resolved configuration
+
+**Returns:** [[schema#class-mdvisconfig|MDVisConfig]]
+
+
+##### create_default_config_file {#method-create-default-config-file}
+
+**Signature:** `def create_default_config_file(self, output_path: Path, project_name: Optional[str] = None) -> None`
+
+> [!info] Documentation
+> Create a default configuration file.
+
+**Returns:** `None`
+
+
+##### get_config_info {#method-get-config-info}
+
+**Signature:** `def get_config_info(self) -> Dict[str, Any]`
+
+> [!info] Documentation
+> Get information about loaded configuration sources.
+
+**Returns:** `Dict[str, Any]`
+
+
+##### config {#method-config}
+
+**Signature:** `def config(self) -> Optional[MDVisConfig]`
+
+> [!info] Documentation
+> Get the currently loaded configuration.
+
+**Returns:** `Optional[MDVisConfig]`
+
+
+##### validate_paths {#method-validate-paths}
+
+**Signature:** `def validate_paths(self, project_root: Path) -> List[str]`
+
+> [!info] Documentation
+> Validate that configured paths exist and are accessible.
+> 
+> Returns list of validation errors, empty if all valid.
+
+**Returns:** `List[str]`
+
+
+
+## Source Code
+
+```python
 """
 Configuration manager with multi-layer resolution.
 
@@ -336,3 +462,4 @@ class ConfigManager:
                     errors.append(f"Invalid regex in event pattern '{pattern_config.name}': {e}")
         
         return errors
+```

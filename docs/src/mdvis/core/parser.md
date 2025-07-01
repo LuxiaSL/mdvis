@@ -1,3 +1,75 @@
+---
+title: parser
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/core/parser.py
+package: mdvis.core
+stats:
+  classes: 1
+  functions: 0
+  lines_of_code: 843
+  complexity: 127
+tags:
+  - python
+  - module
+  - oop
+  - async
+---
+
+# parser
+
+> [!info] Documentation
+> Enhanced AST parser for extracting rich code structure and metadata.
+> 
+> Parses Python source code to extract detailed information about classes, functions,
+> type hints, async patterns, and other code elements.
+
+## Table of Contents
+
+### Classes
+- [[#class-enhancedastparser|EnhancedASTParser]]
+
+
+## Imports
+
+- **import** `ast`
+- **import** `re`
+- **import** `asyncio`
+- **import** `aiofiles`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `Any`, `Dict`, `List`, `Optional`, `Set`, `Tuple`, `Union`
+- **import** `logging`
+- **from** `models.elements` **import** [[elements#class-module|Module]], [[elements#class-class|Class]], [[elements#class-function|Function]], [[elements#class-parameter|Parameter]], [[elements#class-typeref|TypeRef]], [[elements#class-location|Location]], [[elements#class-decorator|Decorator]], [[elements#class-importstatement|ImportStatement]], [[elements#class-callref|CallRef]], [[elements#class-eventusage|EventUsage]], [[elements#class-asyncpattern|AsyncPattern]], [[elements#class-asyncpatterntype|AsyncPatternType]], [[elements#class-visibilitylevel|VisibilityLevel]], [[elements#class-attribute|Attribute]]
+
+## Classes
+
+### EnhancedASTParser {#class-enhancedastparser}
+
+> [!info] Documentation
+> Enhanced AST parser that extracts detailed code structure and metadata.
+
+#### Methods
+
+##### parse_file {#method-parse-file}
+
+**Signature:** `async def parse_file(self, file_path: Path, source_code: Optional[str] = None) -> Module`
+
+> [!info] Documentation
+> Parse a Python file and return a Module object with rich metadata.
+> 
+> Args:
+>     file_path: Path to the Python file
+>     source_code: Optional source code (if already loaded)
+>     
+> Returns:
+>     Parsed Module object
+
+**Returns:** [[elements#class-module|Module]]
+
+
+
+## Source Code
+
+```python
 """
 Enhanced AST parser for extracting rich code structure and metadata.
 
@@ -841,3 +913,4 @@ class EnhancedASTParser:
                 todos.append(f"Line {line_num}: {todo_type}: {todo_text.strip()}")
         
         return todos
+```

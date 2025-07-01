@@ -1,3 +1,145 @@
+---
+title: processor
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/core/processor.py
+package: mdvis.core
+stats:
+  classes: 2
+  functions: 0
+  lines_of_code: 377
+  complexity: 38
+tags:
+  - python
+  - module
+  - oop
+  - async
+---
+
+# processor
+
+> [!info] Documentation
+> Main documentation processor that orchestrates the entire pipeline.
+> 
+> Coordinates scanning, parsing, analysis, and generation phases to produce
+> comprehensive documentation with smart cross-references.
+
+## Table of Contents
+
+### Classes
+- [[#class-processingstats|ProcessingStats]]
+- [[#class-documentationprocessor|DocumentationProcessor]]
+
+
+## Imports
+
+- **import** `asyncio`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `List`, `Dict`, `Any`, `Optional`, `Callable`, `Awaitable`
+- **import** `logging`
+- **from** `config.schema` **import** [[schema#class-mdvisconfig|MDVisConfig]]
+- **from** `models.elements` **import** [[elements#class-module|Module]]
+- **from** `models.index` **import** [[index#class-crossreferenceindex|CrossReferenceIndex]]
+- **from** [[scanner]] **import** [[scanner#class-filescanner|FileScanner]], [[scanner#class-sourcefileinfo|SourceFileInfo]], [[scanner#function-scan-with-metadata|scan_with_metadata]]
+- **from** [[parser]] **import** [[parser#class-enhancedastparser|EnhancedASTParser]]
+- **from** [[indexer]] **import** [[indexer#class-indexbuilder|IndexBuilder]]
+
+## Classes
+
+### ProcessingStats {#class-processingstats}
+
+> [!info] Documentation
+> Statistics about the processing pipeline.
+
+#### Methods
+
+
+### DocumentationProcessor {#class-documentationprocessor}
+
+> [!info] Documentation
+> Main processor that orchestrates the documentation generation pipeline.
+> 
+> Phases:
+> 1. Discovery - Find all Python files
+> 2. Parsing - Parse files into AST and extract structure  
+> 3. Indexing - Build cross-reference relationships
+> 4. Analysis - Enhanced analysis (types, async, events)
+> 5. Generation - Create markdown documentation
+
+#### Methods
+
+##### process_codebase {#method-process-codebase}
+
+**Signature:** `async def process_codebase(self, source_root: Path, output_root: Path, progress_callback: Optional[ProgressCallback] = None) -> None`
+
+> [!info] Documentation
+> Process an entire codebase and generate documentation.
+> 
+> Args:
+>     source_root: Root directory where source_paths are relative to
+>     output_root: Root directory for output documentation  
+>     progress_callback: Optional callback for progress updates (description, percentage)
+
+**Returns:** `None`
+
+
+##### modules {#method-modules}
+
+**Signature:** `def modules(self) -> List[Module]`
+
+> [!info] Documentation
+> Get the processed modules.
+
+**Returns:** `List[Module]`
+
+
+##### index {#method-index}
+
+**Signature:** `def index(self) -> Optional[CrossReferenceIndex]`
+
+> [!info] Documentation
+> Get the cross-reference index.
+
+**Returns:** `Optional[CrossReferenceIndex]`
+
+
+##### get_module_by_name {#method-get-module-by-name}
+
+**Signature:** `def get_module_by_name(self, name: str) -> Optional[Module]`
+
+> [!info] Documentation
+> Get a module by name.
+
+**Returns:** `Optional[Module]`
+
+
+##### get_modules_by_package {#method-get-modules-by-package}
+
+**Signature:** `def get_modules_by_package(self, package: str) -> List[Module]`
+
+> [!info] Documentation
+> Get all modules in a package.
+
+**Returns:** `List[Module]`
+
+
+##### get_processing_summary {#method-get-processing-summary}
+
+**Signature:** `def get_processing_summary(self) -> Dict[str, Any]`
+
+> [!info] Documentation
+> Get a summary of processing results.
+
+**Returns:** `Dict[str, Any]`
+
+
+
+## TODOs
+
+- [ ] Line 231: TODO: Implement enhanced analysis modules
+
+## Source Code
+
+```python
 """
 Main documentation processor that orchestrates the entire pipeline.
 
@@ -375,3 +517,4 @@ Generated on: {self.stats.processing_time:.2f}s
             ],
             'errors': self.stats.errors
         }
+```

@@ -1,3 +1,80 @@
+---
+title: obsidian
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/output/obsidian.py
+package: mdvis.output
+stats:
+  classes: 1
+  functions: 0
+  lines_of_code: 809
+  complexity: 132
+tags:
+  - python
+  - module
+  - oop
+  - async
+---
+
+# obsidian
+
+> [!info] Documentation
+> Obsidian markdown generator with smart cross-references.
+> 
+> Generates clean, navigable markdown documentation optimized for Obsidian
+> with proper wikilinks, anchors, and cross-references using templates and visualizations.
+
+## Table of Contents
+
+### Classes
+- [[#class-obsidiangenerator|ObsidianGenerator]]
+
+
+## Imports
+
+- **import** `asyncio`
+- **import** `aiofiles`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `List`, `Dict`, `Any`, `Optional`, `Set`
+- **from** `datetime` **import** `datetime`
+- **import** `logging`
+- **from** `config.schema` **import** [[schema#class-mdvisconfig|MDVisConfig]]
+- **from** `models.elements` **import** [[elements#class-module|Module]], [[elements#class-class|Class]], [[elements#class-function|Function]], [[elements#class-parameter|Parameter]], [[elements#class-importstatement|ImportStatement]], [[elements#class-visibilitylevel|VisibilityLevel]]
+- **from** `models.index` **import** [[index#class-crossreferenceindex|CrossReferenceIndex]]
+- **from** [[templates]] **import** [[templates#function-create-template-manager|create_template_manager]]
+- **from** [[visualizations]] **import** [[visualizations#function-create-mermaid-generator|create_mermaid_generator]]
+
+## Classes
+
+### ObsidianGenerator {#class-obsidiangenerator}
+
+> [!info] Documentation
+> Generates Obsidian-compatible markdown documentation with smart linking.
+
+#### Methods
+
+##### generate_documentation {#method-generate-documentation}
+
+**Signature:** `async def generate_documentation(self, modules: List[Module], output_root: Path) -> None`
+
+> [!info] Documentation
+> Generate complete documentation for all modules.
+> 
+> Args:
+>     modules: List of modules to document
+>     output_root: Root directory for output
+
+**Returns:** `None`
+
+
+
+## TODOs
+
+- [ ] Line 242: TODO: s
+- [ ] Line 576: TODO: s", ""]
+
+## Source Code
+
+```python
 """
 Obsidian markdown generator with smart cross-references.
 
@@ -807,3 +884,4 @@ Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             if name.startswith('_'):
                 return False
         return True
+```

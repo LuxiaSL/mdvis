@@ -1,3 +1,181 @@
+---
+title: schema
+type: module
+file_path: /home/luxia/projects/mdvis/src/mdvis/config/schema.py
+package: mdvis.config
+stats:
+  classes: 8
+  functions: 1
+  lines_of_code: 281
+  complexity: 7
+tags:
+  - python
+  - module
+  - oop
+---
+
+# schema
+
+> [!info] Documentation
+> Configuration schema and validation using Pydantic.
+> 
+> Defines the structure and validation rules for mdvis configuration.
+
+## Table of Contents
+
+### Classes
+- [[#class-eventpatternconfig|EventPatternConfig]]
+- [[#class-eventconfig|EventConfig]]
+- [[#class-outputconfig|OutputConfig]]
+- [[#class-analysisconfig|AnalysisConfig]]
+- [[#class-visualizationconfig|VisualizationConfig]]
+- [[#class-lintingconfig|LintingConfig]]
+- [[#class-projectconfig|ProjectConfig]]
+- [[#class-mdvisconfig|MDVisConfig]]
+
+### Functions
+- [[#function-get-default-config|get_default_config]]
+
+
+## Imports
+
+- **from** `__future__` **import** `annotations`
+- **from** `pathlib` **import** `Path`
+- **from** `typing` **import** `Dict`, `List`, `Optional`, `Set`, `Union`, `Literal`
+- **from** `pydantic` **import** `BaseModel`, `Field`, `field_validator`, `model_validator`
+- **import** `re`
+
+## Classes
+
+### EventPatternConfig {#class-eventpatternconfig}
+
+> [!info] Documentation
+> Configuration for event detection patterns.
+
+**Inherits from:** `BaseModel`
+
+#### Methods
+
+##### validate_regex_patterns {#method-validate-regex-patterns}
+
+**Signature:** `def validate_regex_patterns(cls, patterns: List[str]) -> List[str]`
+
+> [!info] Documentation
+> Validate that patterns are valid regex.
+
+**Returns:** `List[str]`
+
+
+
+### EventConfig {#class-eventconfig}
+
+> [!info] Documentation
+> Event system configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'enabled': True, 'auto_detect': True, 'patterns': [{'name': 'custom_events', 'publisher_patterns': ['emit_event\\('], 'subscriber_patterns': ['on_event\\('], 'extract_event_type': '[\'\\"]([^\'\\"]+)[\'\\"]'}]}}}` *(class variable)*
+
+
+### OutputConfig {#class-outputconfig}
+
+> [!info] Documentation
+> Output generation configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'structure': 'mirror', 'include_private': False, 'include_source': True, 'source_position': 'bottom', 'generate_toc': True, 'toc_style': 'standard'}}}` *(class variable)*
+
+
+### AnalysisConfig {#class-analysisconfig}
+
+> [!info] Documentation
+> Code analysis configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'detect_async_patterns': True, 'detect_type_hints': True, 'calculate_complexity': True, 'extract_todos': True, 'track_factory_methods': True, 'track_task_creation': True, 'track_async_context': True}}}` *(class variable)*
+
+
+### VisualizationConfig {#class-visualizationconfig}
+
+> [!info] Documentation
+> Visualization generation configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'generate_dependency_graph': True, 'generate_class_hierarchy': True, 'generate_event_flow': True, 'max_nodes': 50, 'exclude_external': True}}}` *(class variable)*
+
+
+### LintingConfig {#class-lintingconfig}
+
+> [!info] Documentation
+> Code linting configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'enabled': True, 'tools': {'flake8': 'flake8', 'ruff': 'ruff check'}, 'auto_format': True, 'halt_on_errors': False}}}` *(class variable)*
+
+
+### ProjectConfig {#class-projectconfig}
+
+> [!info] Documentation
+> Project-specific configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'json_schema_extra': {'example': {'name': 'MyProject', 'description': 'A Python project for demonstration', 'version': '1.0.0', 'source_paths': ['src', 'lib'], 'exclude_patterns': ['**/tests/**', '**/__pycache__/**']}}}` *(class variable)*
+
+
+### MDVisConfig {#class-mdvisconfig}
+
+> [!info] Documentation
+> Complete mdvis configuration.
+
+**Inherits from:** `BaseModel`
+
+#### Attributes
+
+- **model_config** = `{'validate_assignment': True, 'json_schema_extra': {'example': {'verbosity': 'standard', 'project': {'name': 'MyProject', 'source_paths': ['src']}, 'output': {'structure': 'mirror', 'include_private': False}, 'events': {'enabled': True, 'auto_detect': True}}}}` *(class variable)*
+
+#### Methods
+
+##### validate_config_consistency {#method-validate-config-consistency}
+
+**Signature:** `def validate_config_consistency(self)`
+
+> [!info] Documentation
+> Validate configuration consistency.
+
+
+
+## Functions
+
+### get_default_config {#function-get-default-config}
+
+**Signature:** `def get_default_config() -> MDVisConfig`
+
+> [!info] Documentation
+> Get the default configuration with built-in event patterns.
+
+**Returns:** [[schema#class-mdvisconfig|MDVisConfig]]
+
+
+## Source Code
+
+```python
 """
 Configuration schema and validation using Pydantic.
 
@@ -279,3 +457,4 @@ def get_default_config() -> MDVisConfig:
         config.events.patterns.extend(DEFAULT_EVENT_PATTERNS)
     
     return config
+```
