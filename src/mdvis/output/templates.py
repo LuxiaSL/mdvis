@@ -355,18 +355,18 @@ class TemplateLoader(BaseLoader):
 {% if module.classes %}
 ## Classes
 {% for class in module.classes %}
-- [[#{{ class.name | anchor }}|{{ class.name }}]]
+- [[#{{ ('class-' + class.name) | anchor }}|{{ class.name }}]]
 {% endfor %}
 {% endif %}
 
 {% if module.functions %}
 ## Functions  
 {% for function in module.functions %}
-- [[#{{ function.name | anchor }}|{{ function.name }}]]
+- [[#{{ ('function-' + function.name) | anchor }}|{{ function.name }}]]
 {% endfor %}
 {% endif %}""",
 
-            "module_standard.md.j2": """# {{ module.name }}
+        "module_standard.md.j2": """# {{ module.name }}
 
 {% if module.docstring %}
 > {{ module.docstring }}
@@ -392,7 +392,7 @@ class TemplateLoader(BaseLoader):
 {% if module.classes %}
 ## Classes
 {% for class in module.classes %}
-### {{ class.name }} {#{{ ('class-' + class.name) | anchor }}}
+{{ '### ' + class.name + ' {#' + ('class-' + class.name) | anchor + '}' }}
 
 {% if class.docstring %}
 > {{ class.docstring }}
@@ -405,7 +405,7 @@ class TemplateLoader(BaseLoader):
 {% if class.methods %}
 #### Methods
 {% for method in class.methods %}
-##### {{ method.name }} {#{{ ('method-' + method.name) | anchor }}}
+{{ '##### ' + method.name + ' {#' + ('method-' + method.name) | anchor + '}' }}
 
 {% if method.docstring %}
 > {{ method.docstring | summary }}
@@ -420,7 +420,7 @@ class TemplateLoader(BaseLoader):
 {% if module.functions %}
 ## Functions
 {% for function in module.functions %}
-### {{ function.name }} {#{{ ('function-' + function.name) | anchor }}}
+{{ '### ' + function.name + ' {#' + ('function-' + function.name) | anchor + '}' }}
 
 {% if function.docstring %}
 > {{ function.docstring }}
@@ -430,7 +430,7 @@ class TemplateLoader(BaseLoader):
 {% endfor %}
 {% endif %}""",
 
-            "module_detailed.md.j2": """---
+        "module_detailed.md.j2": """---
 title: {{ module.name }}
 type: module
 file_path: {{ module.file_path }}
@@ -479,7 +479,7 @@ tags:
 ## Classes
 
 {% for class in module.classes %}
-### Class: {{ class.name }} {#{{ ('class-' + class.name) | anchor }}}
+{{ '### Class: ' + class.name + ' {#' + ('class-' + class.name) | anchor + '}' }}
 
 {% if class.docstring %}
 > [!note] Class Documentation
@@ -498,7 +498,7 @@ tags:
 #### Methods
 
 {% for method in class.methods %}
-##### {{ method.name }} {#{{ ('method-' + method.name) | anchor }}}
+{{ '##### ' + method.name + ' {#' + ('method-' + method.name) | anchor + '}' }}
 
 {% if method.docstring %}
 > {{ method.docstring }}
@@ -529,7 +529,7 @@ tags:
 ## Functions
 
 {% for function in module.functions %}
-### Function: {{ function.name }} {#{{ ('function-' + function.name) | anchor }}}
+{{ '### Function: ' + function.name + ' {#' + ('function-' + function.name) | anchor + '}' }}
 
 {% if function.docstring %}
 > [!note] Function Documentation  
@@ -564,7 +564,7 @@ tags:
 {% endif %}
 {% endfor %}
 {% endif %}""",
-        }
+    }
 
 
 def create_template_manager(verbosity: str = "standard") -> TemplateManager:

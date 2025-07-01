@@ -200,23 +200,41 @@ def scan(ctx, source_path, output, config, verbosity, include_private, events,
     • Includes README.md with project overview and navigation
     """
     try:
-        # Enhanced startup message
         _show_startup_banner(source_path, dry_run)
         
-        project_root = Path.cwd()
-        
-        if source_path.is_absolute():
-            try:
-                relative_source = source_path.relative_to(project_root)
-                source_paths = [str(relative_source)]
-            except ValueError:
-                source_paths = [str(source_path)]
+        if source_path.is_file():
+            actual_source_root = source_path.parent
+            relative_source_paths = [source_path.name]
         else:
-            source_paths = [str(source_path)]
+            actual_source_root = source_path.resolve()
+            relative_source_paths = ["."]
         
-        cli_args = {}
+
+        if config:
+            project_root_for_config = config.parent
+        else:
+            current_dir = Path.cwd()
+            project_root_for_config = current_dir
+            
+            search_dir = current_dir
+            while search_dir != search_dir.parent:  # Don't go past filesystem root
+                if (search_dir / "docs" / "mdvis.yaml").exists() or \
+                   (search_dir / "mdvis.yaml").exists() or \
+                   (search_dir / ".mdvis.yaml").exists():
+                    project_root_for_config = search_dir
+                    break
+                search_dir = search_dir.parent
+            
+            if not any((project_root_for_config / name).exists() 
+                      for name in ["docs/mdvis.yaml", "mdvis.yaml", ".mdvis.yaml"]):
+                try:
+                    actual_source_root.relative_to(current_dir)
+                except ValueError:
+                    project_root_for_config = actual_source_root
         
-        cli_args['source_paths'] = source_paths
+        cli_args = {
+            'source_paths': relative_source_paths,  
+        }
         
         if verbosity:
             cli_args['verbosity'] = verbosity
@@ -235,34 +253,38 @@ def scan(ctx, source_path, output, config, verbosity, include_private, events,
         
         with console.status("[bold blue]Loading configuration..."):
             mdvis_config = config_manager.load_config(
-                project_root=project_root,
+                project_root=project_root_for_config,
                 config_file=config,
                 cli_args=cli_args
             )
         
-        validation_errors = config_manager.validate_paths(project_root)
+        validation_errors = config_manager.validate_paths(actual_source_root)
         if validation_errors:
             _show_validation_errors(validation_errors)
             sys.exit(1)
         
         if output:
-            output_path = output
+            output_path = output.resolve()
         else:
-            output_path = project_root / 'docs'
+            if project_root_for_config == actual_source_root:
+                output_path = actual_source_root / 'docs'
+            else:
+                output_path = project_root_for_config / 'docs'
+            
             if not dry_run:
                 output_path.mkdir(parents=True, exist_ok=True)
-        
+
         if ctx.obj['verbose'] > 0:
-            _show_config_info(config_manager, project_root, output_path, mdvis_config)
+            _show_config_info(config_manager, actual_source_root, output_path, mdvis_config)
         
         if dry_run:
-            asyncio.run(_show_dry_run_info(mdvis_config, project_root, output_path, stats))
+            asyncio.run(_show_dry_run_info(mdvis_config, actual_source_root, output_path, stats))
             return
         
         if watch:
-            asyncio.run(_run_watch_mode(mdvis_config, project_root, output_path))
+            asyncio.run(_run_watch_mode(mdvis_config, actual_source_root, output_path))
         else:
-            asyncio.run(_run_generation(mdvis_config, project_root, output_path, stats))
+            asyncio.run(_run_generation(mdvis_config, actual_source_root, output_path, stats))
         
     except ConfigurationError as e:
         _show_error("Configuration Error", str(e), "Check your configuration file syntax and paths")
